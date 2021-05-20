@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\login",
+    "\\login\\login",
+    "\\login\\register",
+    "\\login\\templates"
+  ],
+  "SelectedNode": "\\login\\login\\settings.py",
+  "PreviewInSolutionExplorer": false
+}

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-light ">
+  <a class="navbar-brand" href="#" onclick="getusergroupforedit()">Register</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#" onclick="getallprofile()">Profile</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" id="login" onclick="login()">Login</a>
+      </li>
+    </ul>
+  </div>
+  </nav>
+</nav>
+<div class="mt-5 container card" id="register">
+<form class=" row vertical-center-row card-body  mr-6 d-inline">
+  
+  <div class="mb-3">
+    <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
+    <input type="email" class="form-control" id="exampleDropdownFormEmail1" placeholder="email@example.com">
+  </div>
+  <div class="mb-3">
+    <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
+    <input type="password" class="form-control" id="exampleDropdownFormPassword1" placeholder="Password">
+  </div>
+  <div class="mb-3">
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" id="dropdownCheck2">
+      <label class="form-check-label" for="dropdownCheck2">
+        Remember me
+      </label>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary" onclick="getauth()" >Sign in</button>
+</form>
+</div>
+</body>
+
+<script>
+
+function getusergroupforedit()
+{
+         $.ajax({
+                                type:"get",
+                         
+                                url: "/getregister/",
+                                success: function(res){
+                                         console.log(res)
+                                         $('#register').html(res)
+                                         }
+                                    
+                        });
+}
+function register()
+{   
+         var fname=document.getElementById("exampleDropdownFormFirst2").value
+         var lname=document.getElementById("exampleDropdownFormLast2").value
+         var email=document.getElementById("exampleDropdownFormEmail2").value
+         var password=document.getElementById("exampleDropdownFormPassword2").value
+         var phone=document.getElementById("exampleDropdownFormPhone2").value
+         var address=document.getElementById("exampleDropdownFormAddress2").value
+         var keyVal = {"fname":fname,"lname":lname,"email":email,"password":password,"phone":phone,"address":address}
+         var JSONvals = JSON.stringify(keyVal)
+         console.log(JSONvals)
+         $.ajax({
+                                type:"post",
+                                headers: { "X-CSRFToken": csrftoken },
+                                url: "/register/",
+                                data: JSONvals,
+                                success: function(res){
+                                         console.log(res)
+                                         access = res['access']
+                                         refresh = res['refresh']
+                                         result = res['result']
+                                         localStorage.setItem("register_access_token", access);
+                                         localStorage.setItem("register_refresh_token", refresh);
+                                         
+                                    }
+                        });
+}
+
+function getauth()
+{   
+         var email=document.getElementById("exampleDropdownFormEmail1").value
+         var password=document.getElementById("exampleDropdownFormPassword1").value
+         var keyVal = {"email":email,"password":password}
+         var JSONvals = JSON.stringify(keyVal)
+         console.log(JSONvals)
+         access = localStorage.getItem('register_access_token')
+         refresh = localStorage.getItem('register_refresh_token')
+         var keynewval = {"refresh":refresh}
+         var refreshvalue = JSON.stringify(keynewval)
+         $.ajax({
+                                type:"post",
+                                headers: { Authorization: 'Bearer ' + access  },
+                                url: "/auth/",
+                                data: refreshvalue,
+                                success: function(res){
+                                         if (res == 'success'){
+                                            $('#login').text('Logout')
+                                            alert('Login success')
+                                         }
+                                         else if('res' in res && res['res'] == 'refresh token'){
+                                            localStorage.setItem("register_access_token", res['access']);
+                                            alert('Refresh token is done')
+                                         }
+                                         else{
+                                            alert('Wrong Credentials')
+                                         }
+                                    }
+                        });
+}
+
+function getallprofile()
+{
+         $.ajax({
+                                type:"get",
+                                url: "/profile/",
+                                success: function(res){
+                                         console.log(res)
+                                         $('#register').html(res)   
+                                    }
+                        });
+}
+
+function login(){
+    if ($('#login').text() == 'Login'){
+        //val = $('#register').html()
+        $('#register').html('')
+        newhtml = '<form class=" row vertical-center-row card-body  mr-6 d-inline">'+
+  '{% csrf_token %}'+  
+  '<div class="mb-3">'+
+    '<label for="exampleDropdownFormEmail1" class="form-label">Email address</label>'+
+    '<input type="email" class="form-control" id="exampleDropdownFormEmail1" placeholder="email@example.com">'+
+  '</div>'+
+  '<div class="mb-3">'+
+    '<label for="exampleDropdownFormPassword1" class="form-label">Password</label>'+
+    '<input type="password" class="form-control" id="exampleDropdownFormPassword1" placeholder="Password">'+
+  '</div>'+
+  '<div class="mb-3">'+
+    '<div class="form-check">'+
+      '<input type="checkbox" class="form-check-input" id="dropdownCheck2">'+
+      '<label class="form-check-label" for="dropdownCheck2">'+
+        'Remember me'+
+      '</label>'+
+    '</div>'+
+  '</div>'+
+  '<button type="submit" class="btn btn-primary" onclick="getauth()" >Sign in</button>'+
+'</form>'
+        $('#register').html(newhtml)
+    }
+    else{
+        $('#login').text('Login')
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+</script>
+</html>

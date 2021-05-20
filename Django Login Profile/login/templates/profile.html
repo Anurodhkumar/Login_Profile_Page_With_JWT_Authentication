@@ -1,0 +1,27 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Profile</title>
+</head>
+<body>
+<h1>List of Profiles</h1>
+<table border="1" width="600">
+<tr>
+<td>First Name</td>
+<td>Last Name</td>
+<td>EMail</td>
+<td>Phone</td>
+<td>Address</td>
+</tr>
+{% for video in client %}
+<tr>
+<td>{{ video.fname }}</td>
+<td>{{ video.lname }}</td>
+<td>{{ video.email }}</td>
+<td>{{ video.phone }}</td>
+<td>{{ video.address }}</td>
+</tr>
+{% endfor %}
+</table>
+</body>
+</html>
